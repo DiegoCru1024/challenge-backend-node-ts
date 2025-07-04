@@ -4,8 +4,11 @@ import {
   createProductSchema,
   purchaseProductSchema,
   CreateProductInput,
-} from '../../utils/products.validations';
+} from '../../validations/products.validations';
 import { GraphQLError } from 'graphql';
+import { createModuleLogger } from '../../utils/logger.utils';
+
+const logger = createModuleLogger('ProductMutations');
 
 export const mutations = {
   createProduct: async (_: any, { input }: { input: CreateProductInput }) => {
@@ -16,6 +19,7 @@ export const mutations = {
         validatedInput.accountId
       );
       if (!account) {
+        logger.warn('Product creation failed - account not found', { accountId: validatedInput.accountId });
         throw new GraphQLError('La cuenta especificada no existe', {
           extensions: { code: 'ACCOUNT_NOT_FOUND' },
         });
@@ -25,6 +29,7 @@ export const mutations = {
         validatedInput.sku
       );
       if (existingProduct) {
+        logger.warn('Product creation failed - SKU already exists', { sku: validatedInput.sku });
         throw new GraphQLError('Ya existe un producto con este SKU', {
           extensions: { code: 'SKU_ALREADY_EXISTS' },
         });
@@ -32,13 +37,21 @@ export const mutations = {
 
       const newProduct = await productRepository.create(validatedInput);
 
+      logger.info('Product created successfully via GraphQL', {
+        id: newProduct.id,
+        sku: newProduct.sku,
+        accountId: newProduct.accountId
+      });
+
       return newProduct;
     } catch (error: any) {
       if (error.name === 'ZodError') {
+        logger.warn('Invalid input data for product creation', { input, error: error.errors });
         throw new GraphQLError('Datos de entrada inválidos', {
           extensions: { code: 'INVALID_INPUT', details: error.errors },
         });
       }
+      logger.error('Error in createProduct mutation', { input, error: error.message });
       throw error;
     }
   },
@@ -62,6 +75,7 @@ export const mutations = {
         validatedInput.accountId
       );
       if (!account) {
+        logger.warn('Purchase failed - account not found', { accountId: validatedInput.accountId });
         return {
           success: false,
           message: 'La cuenta especificada no existe',
@@ -73,6 +87,7 @@ export const mutations = {
         validatedInput.productId
       );
       if (!product) {
+        logger.warn('Purchase failed - product not found', { productId: validatedInput.productId });
         return {
           success: false,
           message: 'El producto especificado no existe',
@@ -81,6 +96,11 @@ export const mutations = {
       }
 
       if (product.accountId !== validatedInput.accountId) {
+        logger.warn('Purchase failed - product does not belong to account', {
+          productId: validatedInput.productId,
+          accountId: validatedInput.accountId,
+          productAccountId: product.accountId
+        });
         return {
           success: false,
           message: 'El producto no pertenece a la cuenta especificada',
@@ -89,6 +109,11 @@ export const mutations = {
       }
 
       if (product.stock < validatedInput.quantity) {
+        logger.warn('Purchase failed - insufficient stock', {
+          productId: validatedInput.productId,
+          requestedQuantity: validatedInput.quantity,
+          availableStock: product.stock
+        });
         return {
           success: false,
           message: `Stock insuficiente. Stock disponible: ${product.stock}`,
@@ -101,6 +126,13 @@ export const mutations = {
         validatedInput.quantity
       );
 
+      logger.info('Purchase completed successfully', {
+        productId: validatedInput.productId,
+        accountId: validatedInput.accountId,
+        quantity: validatedInput.quantity,
+        newStock: updatedProduct?.stock
+      });
+
       return {
         success: true,
         message: `Compra realizada exitosamente. Cantidad: ${validatedInput.quantity}`,
@@ -108,10 +140,22 @@ export const mutations = {
       };
     } catch (error: any) {
       if (error.name === 'ZodError') {
+        logger.warn('Invalid input data for product purchase', {
+          accountId,
+          productId,
+          quantity,
+          error: error.errors
+        });
         throw new GraphQLError('Parámetros inválidos', {
           extensions: { code: 'INVALID_INPUT', details: error.errors },
         });
       }
+      logger.error('Error in purchaseProduct mutation', {
+        accountId,
+        productId,
+        quantity,
+        error: error.message
+      });
       return {
         success: false,
         message: `Error al procesar la compra: ${error.message}`,

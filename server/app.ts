@@ -3,10 +3,13 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 
 import { startApolloServer } from './graphql';
+import { logger, httpLogger } from './config/logger';
 
 import config from './config/app';
 
 const app = express();
+
+app.use(httpLogger);
 
 app.use(cors());
 
@@ -29,5 +32,5 @@ startApolloServer(app);
 app.set('port', config.server.port);
 
 app.listen(app.get('port'), () =>
-  console.info(`Server running on port ${app.get('port')}`)
+  logger.info(`Server running on port ${app.get('port')}`)
 );

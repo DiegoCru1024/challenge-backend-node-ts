@@ -1,5 +1,6 @@
 import { IProduct } from '../interfaces/product';
 import Products from '../models/products';
+import { createModuleLogger } from '../utils/logger.utils';
 
 export interface PaginationParams {
   page: number;
@@ -15,11 +16,19 @@ export interface PaginatedResult<T> {
 }
 
 export class ProductRepository {
+  private logger = createModuleLogger('ProductRepository');
   async create(
     productData: Omit<IProduct, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<IProduct> {
-    const product = new Products(productData);
-    return await product.save();
+    try {
+      const product = new Products(productData);
+      const savedProduct = await product.save();
+      this.logger.info('Product created successfully', { id: savedProduct.id, sku: savedProduct.sku });
+      return savedProduct;
+    } catch (error) {
+      this.logger.error('Error creating product', { error, sku: productData.sku });
+      throw error;
+    }
   }
 
   async findById(id: string): Promise<IProduct | null> {
@@ -56,25 +65,63 @@ export class ProductRepository {
   }
 
   async updateStock(id: string, newStock: number): Promise<IProduct | null> {
-    return await Products.findByIdAndUpdate(
-      id,
-      { stock: newStock },
-      { new: true, runValidators: true }
-    );
+    try {
+      this.logger.info('Updating product stock', { id, newStock });
+      const updatedProduct = await Products.findByIdAndUpdate(
+        id,
+        { stock: newStock },
+        { new: true, runValidators: true }
+      );
+
+      if (updatedProduct) {
+        this.logger.info('Product stock updated successfully', {
+          id,
+          oldStock: updatedProduct.stock,
+          newStock
+        });
+      } else {
+        this.logger.warn('Product not found for stock update', { id });
+      }
+
+      return updatedProduct;
+    } catch (error) {
+      this.logger.error('Error updating product stock', { error, id, newStock });
+      throw error;
+    }
   }
 
   async decreaseStock(id: string, quantity: number): Promise<IProduct | null> {
-    const product = await Products.findById(id);
-    if (!product) {
-      return null;
-    }
+    try {
+      this.logger.info('Attempting to decrease product stock', { id, quantity });
 
-    if (product.stock < quantity) {
-      throw new Error('Stock insuficiente');
-    }
+      const product = await Products.findById(id);
+      if (!product) {
+        this.logger.warn('Product not found for stock decrease', { id });
+        return null;
+      }
 
-    const newStock = product.stock - quantity;
-    return await this.updateStock(id, newStock);
+      if (product.stock < quantity) {
+        this.logger.warn('Insufficient stock for decrease operation', {
+          id,
+          currentStock: product.stock,
+          requestedQuantity: quantity
+        });
+        throw new Error('Stock insuficiente');
+      }
+
+      const newStock = product.stock - quantity;
+      this.logger.info('Decreasing stock', {
+        id,
+        currentStock: product.stock,
+        quantity,
+        newStock
+      });
+
+      return await this.updateStock(id, newStock);
+    } catch (error) {
+      this.logger.error('Error decreasing product stock', { error, id, quantity });
+      throw error;
+    }
   }
 }
 
