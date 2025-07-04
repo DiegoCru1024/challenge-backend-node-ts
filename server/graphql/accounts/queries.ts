@@ -1,5 +1,8 @@
 import { accountRepository } from '../../repositories/accounts.repository';
-import { accountIdSchema, accountsFilterSchema } from '../../utils/accounts.validations';
+import {
+  accountIdSchema,
+  accountsFilterSchema,
+} from '../../utils/accounts.validations';
 import { GraphQLError } from 'graphql';
 
 export const queries = {
@@ -11,7 +14,7 @@ export const queries = {
 
       if (!account) {
         throw new GraphQLError('Cuenta no encontrada', {
-          extensions: { code: 'ACCOUNT_NOT_FOUND' }
+          extensions: { code: 'ACCOUNT_NOT_FOUND' },
         });
       }
 
@@ -19,7 +22,7 @@ export const queries = {
     } catch (error: any) {
       if (error.name === 'ZodError') {
         throw new GraphQLError('ID inválido', {
-          extensions: { code: 'INVALID_INPUT', details: error.errors }
+          extensions: { code: 'INVALID_INPUT', details: error.errors },
         });
       }
       throw error;
@@ -34,7 +37,7 @@ export const queries = {
         validatedFilter.name,
         {
           page: validatedFilter.page,
-          limit: validatedFilter.limit
+          limit: validatedFilter.limit,
         }
       );
 
@@ -42,7 +45,7 @@ export const queries = {
     } catch (error: any) {
       if (error.name === 'ZodError') {
         throw new GraphQLError('Parámetros de filtro inválidos', {
-          extensions: { code: 'INVALID_INPUT', details: error.errors }
+          extensions: { code: 'INVALID_INPUT', details: error.errors },
         });
       }
       throw error;

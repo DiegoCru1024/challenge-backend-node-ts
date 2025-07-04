@@ -1,10 +1,10 @@
-import express from "express";
-import bodyParser from "body-parser";
-import cors from "cors";
+import express from 'express';
+import bodyParser from 'body-parser';
+import cors from 'cors';
 
-import { startApolloServer } from "./graphql";
+import { startApolloServer } from './graphql';
 
-import config from "./config/app";
+import config from './config/app';
 
 const app = express();
 
@@ -26,8 +26,8 @@ app.use((req, res, next) => {
 
 startApolloServer(app);
 
-app.set("port", config.server.port);
+app.set('port', config.server.port);
 
-app.listen(app.get("port"), () =>
-  console.info(`Server running on port ${app.get("port")}`)
+app.listen(app.get('port'), () =>
+  console.info(`Server running on port ${app.get('port')}`)
 );

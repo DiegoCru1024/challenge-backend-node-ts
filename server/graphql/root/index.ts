@@ -1,16 +1,16 @@
-import { gql } from "apollo-server-express";
+import { gql } from 'apollo-server-express';
 
 import {
   schema as accountsSchema,
   queries as accountsQueries,
   mutations as accountsMutations,
-} from "../accounts";
+} from '../accounts';
 
 import {
   schema as productsSchema,
   queries as productsQueries,
   mutations as productsMutations,
-} from "../products";
+} from '../products';
 
 const rootTypeDefs = gql`
   type Query {

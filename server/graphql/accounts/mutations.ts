@@ -1,5 +1,8 @@
 import { accountRepository } from '../../repositories/accounts.repository';
-import { createAccountSchema, CreateAccountInput } from '../../utils/accounts.validations';
+import {
+  createAccountSchema,
+  CreateAccountInput,
+} from '../../utils/accounts.validations';
 import { GraphQLError } from 'graphql';
 
 export const mutations = {
@@ -7,10 +10,12 @@ export const mutations = {
     try {
       const validatedInput = createAccountSchema.parse(input);
 
-      const existingAccount = await accountRepository.findByEmail(validatedInput.email);
+      const existingAccount = await accountRepository.findByEmail(
+        validatedInput.email
+      );
       if (existingAccount) {
         throw new GraphQLError('Ya existe una cuenta con este email', {
-          extensions: { code: 'EMAIL_ALREADY_EXISTS' }
+          extensions: { code: 'EMAIL_ALREADY_EXISTS' },
         });
       }
 
@@ -20,7 +25,7 @@ export const mutations = {
     } catch (error: any) {
       if (error.name === 'ZodError') {
         throw new GraphQLError('Datos de entrada inválidos', {
-          extensions: { code: 'INVALID_INPUT', details: error.errors }
+          extensions: { code: 'INVALID_INPUT', details: error.errors },
         });
       }
       throw error;

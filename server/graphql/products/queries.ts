@@ -1,5 +1,8 @@
 import { productRepository } from '../../repositories/products.repository';
-import { productIdSchema, productsFilterSchema } from '../../utils/products.validations';
+import {
+  productIdSchema,
+  productsFilterSchema,
+} from '../../utils/products.validations';
 import { GraphQLError } from 'graphql';
 
 export const queries = {
@@ -11,7 +14,7 @@ export const queries = {
 
       if (!product) {
         throw new GraphQLError('Producto no encontrado', {
-          extensions: { code: 'PRODUCT_NOT_FOUND' }
+          extensions: { code: 'PRODUCT_NOT_FOUND' },
         });
       }
 
@@ -19,7 +22,7 @@ export const queries = {
     } catch (error: any) {
       if (error.name === 'ZodError') {
         throw new GraphQLError('ID inválido', {
-          extensions: { code: 'INVALID_INPUT', details: error.errors }
+          extensions: { code: 'INVALID_INPUT', details: error.errors },
         });
       }
       throw error;
@@ -34,7 +37,7 @@ export const queries = {
         validatedFilter.accountId,
         {
           page: validatedFilter.page,
-          limit: validatedFilter.limit
+          limit: validatedFilter.limit,
         }
       );
 
@@ -42,7 +45,7 @@ export const queries = {
     } catch (error: any) {
       if (error.name === 'ZodError') {
         throw new GraphQLError('Parámetros de filtro inválidos', {
-          extensions: { code: 'INVALID_INPUT', details: error.errors }
+          extensions: { code: 'INVALID_INPUT', details: error.errors },
         });
       }
       throw error;

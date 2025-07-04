@@ -1,10 +1,10 @@
-import * as xmlrpc from "xmlrpc";
+import * as xmlrpc from 'xmlrpc';
 
-import config from '../config/app'
+import config from '../config/app';
 
 const {
-    odoo: { url, db, uid, password }
-} = config
+  odoo: { url, db, uid, password },
+} = config;
 
 const client = xmlrpc.createClient({ url });
 
@@ -12,15 +12,15 @@ class OdooService {
   getOdooClientInfo = async (email: string) => {
     return new Promise((resolve, reject) => {
       client.methodCall(
-        "execute_kw",
+        'execute_kw',
         [
           db,
           Number(uid),
           password,
-          "res.partner",
-          "search_read",
-          [[["email", "=", email]]],
-          { fields: ["name", "vat", "email", "street"] },
+          'res.partner',
+          'search_read',
+          [[['email', '=', email]]],
+          { fields: ['name', 'vat', 'email', 'street'] },
         ],
         (err: any, value: any) => {
           if (err) reject(err);

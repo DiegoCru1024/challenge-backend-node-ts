@@ -1,4 +1,4 @@
-import { gql } from "apollo-server-express";
+import { gql } from 'apollo-server-express';
 
 export const schema = gql`
   type Product {
@@ -45,6 +45,10 @@ export const schema = gql`
 
   extend type Mutation {
     createProduct(input: CreateProductInput!): Product!
-    purchaseProduct(accountId: ID!, productId: ID!, quantity: Int!): PurchaseResult!
+    purchaseProduct(
+      accountId: ID!
+      productId: ID!
+      quantity: Int!
+    ): PurchaseResult!
   }
 `;
