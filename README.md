@@ -1,112 +1,99 @@
-# Reto Backend Semi-Senior - GraphQL + MongoDB
+# Backend Node TS - Challenge
 
-## 🚀 Objetivo
+## Stack
 
-Construir una API GraphQL que gestione cuentas y productos, permitiendo:
+- **Node.js** con **TypeScript**
+- **Express.js** como framework web
+- **GraphQL** con Apollo Server para APIs
+- **MongoDB** como base de datos
+- **Logging** estructurado con Pino
+- **Validaciones** con Zod
+- **Formateo de código** con Prettier
 
-- Crear y consultar cuentas y productos.
-- Asociar productos a cuentas.
-- Simular una compra (actualizar stock).
-- (BONUS) Integrarse con Odoo (XML-RPC).
+## Instalación
 
-## 👁‍🗨️ Stack esperado
-
-- Node.js + TypeScript
-- Express + Apollo Server (GraphQL)
-- MongoDB (conexión a dos bases)
-- Buenas prácticas de código (tipado, validaciones)
-- Uso de eslint/prettier
-- Manejo de logger
-- (Opcional) XML-RPC
-
-## 🗂️ Estructura del proyecto base
-
+### 1. Instala las dependencias:
 ```bash
-server/
-├── config/
-│   └── app.ts              # Variables de entorno centralizadas
-├── db/
-│   └── mongodb.ts          # Conexión multi-base
-├── graphql/
-│   ├── accounts/
-│   │   ├── index.ts
-│   │   ├── queries.ts
-│   │   ├── mutations.ts
-│   │   └── schema.ts
-│   ├── products/
-│   │   ├── index.ts
-│   │   ├── queries.ts
-│   │   ├── mutations.ts
-│   │   └── schema.ts
-│   └── root/
-│       └── index.ts        # TypeDefs y resolvers principales
-│   └── index.ts            # Exporta los typeDefs y resolvers combinados
-├── interfaces/
-│   ├── account.ts          # IAccount
-│   └── product.ts          # IProduct
-├── models/
-│   ├── accounts.ts
-│   └── products.ts
-├── services/
-│   ├── odoo.ts
-├── app.ts                  # Setup del servidor Express + Apollo
-├── .env
-├── .env.test
-├── .gitignore
-├── logo.png
-├── package.json
-├── tsconfig.json
-└── README.md
+npm install
 ```
 
-## ✍️ Requisitos del reto
+### 2. Configura las variables de entorno:
 
-### 1. Cuentas (DB: `eiAccounts`, colección `accounts`)
+Crea un archivo `.env` en la raíz del proyecto basándote en `.env.test`:
+```bash
+cp .env.test .env
+```
 
-- Crear cuenta: `name`, `email`
-- Consultar cuenta por ID
-- Listar cuentas con filtro por nombre (paginado)
+Edita el archivo `.env` con tus configuraciones:
+```env
+# Aplicación:
+PORT=3000
 
-### 2. Productos (DB: `eiBusiness`, colección `products`)
+# Base de datos MongoDB:
+MONGODB_URL_ACCOUNTS='mongodb://localhost:27017/eiAccounts'
+MONGODB_URL_PRODUCTS='mongodb://localhost:27017/eiBusiness'
 
-- Crear producto: `name`, `sku`, `stock`
-- Consultar producto por ID
-- Listar productos por ID de cuenta (relación manual)
+# Odoo (opcional):
+ODOO_URL='http://localhost:8069'
+ODOO_DB='tu_base_de_datos'
+ODOO_UID='tu_usuario_id'
+ODOO_PASSWORD='tu_contraseña'
 
-### 3. Simulación de compra
+# Logging (opcional):
+LOG_LEVEL=info
+```
 
-- Mutation: `purchaseProduct(accountId: ID!, productId: ID!, quantity: Int!)`
-  - Valida existencia de cuenta
-  - Valida existencia de producto
-  - Valida stock suficiente
-  - Resta cantidad del stock y retorna un mensaje de éxito o error
+### 3. Ejecuta la aplicación:
 
-### 4. BONUS (Odoo)
+```bash
+npm run dev
+```
 
-- Usar `xmlrpc` para consultar información de cliente en Odoo (correo o nombre)
-- Crear una función para crear o editar clientes en Odoo (por ejemplo, `res.partner.create` o `res.partner.write` usando XML-RPC).
-- **No es necesario contar con un entorno Odoo funcional.** Basta con que documentes en código cómo se haría la integración (estructura del método, parámetros esperados, y ejemplo de llamada).
-- Si lo deseas, puedes usar mocks o comentarios explicativos para demostrar tu comprensión.
+## Acceso a la API
 
-## 📑 Criterios de evaluación
+Una vez que el servidor esté ejecutándose, podrás acceder a:
 
-| Criterio                      | Puntos |
-| ----------------------------- | ------ |
-| Correcta implementación       | 30     |
-| Organización del proyecto     | 20     |
-| Buen uso de GraphQL y Typings | 20     |
-| Validaciones y errores        | 10     |
-| Documentación y claridad      | 10     |
-| Bonus Odoo (opcional)         | 10     |
+- **GraphQL Playground:** `http://localhost:3000/graphql`
+- **Servidor:** `http://localhost:3000`
 
-## ✅ Entregables
+## Estructura del Proyecto
 
-- Repositorio GitHub o archivo ZIP
-- README con instrucciones para levantar el proyecto
-- Documentación de operaciones (puede ser en GraphQL Playground)
-
----
-
-📢 **Importante**: Este reto está diseñado para ser resuelto en 1 o 2 días como máximo. No se espera una arquitectura enterprise, pero sí buenas prácticas y claridad.
-
-🎓 Empresa: [Equip](https://www.equipconstruye.com) - B2B de materiales de construcción en Lima, Perú.
+```
+server/
+├── app.ts                 # Punto de entrada de la aplicación
+├── config/               # Configuraciones
+│   ├── app.ts           # Configuración principal
+│   └── logger.ts        # Configuración de logging
+├── db/                  # Conexiones a base de datos
+│   └── mongodb.ts       # Configuración de MongoDB
+├── graphql/             # Esquemas y resolvers de GraphQL
+│   ├── accounts/        # Módulo de cuentas
+│   │   ├── index.ts
+│   │   ├── queries.ts
+│   │   ├── mutations.ts
+│   │   └── schema.ts
+│   ├── products/        # Módulo de productos
+│   │   ├── index.ts
+│   │   ├── queries.ts
+│   │   ├── mutations.ts
+│   │   └── schema.ts
+│   ├── root/           # Esquema raíz
+│   │   └── index.ts
+│   └── index.ts        # Configuración de Apollo Server
+├── interfaces/          # Interfaces de TypeScript
+│   ├── account.ts      # IAccount
+│   └── product.ts      # IProduct
+├── models/             # Modelos de datos
+│   ├── accounts.ts
+│   └── products.ts
+├── repositories/       # Capa de acceso a datos
+│   ├── accounts.repository.ts
+│   └── products.repository.ts
+├── services/           # Servicios externos
+│   └── odoo.ts        # Integración con Odoo
+├── utils/              # Utilidades
+│   └── logger.utils.ts
+└── validations/        # Esquemas de validación
+    ├── accounts.validations.ts
+    └── products.validations.ts
+```
