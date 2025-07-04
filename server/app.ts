@@ -9,8 +9,20 @@ import config from "./config/app";
 const app = express();
 
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use((req, res, next) => {
+  if (req.path === '/graphql') {
+    return next();
+  }
+  bodyParser.json()(req, res, next);
+});
+
+app.use((req, res, next) => {
+  if (req.path === '/graphql') {
+    return next();
+  }
+  bodyParser.urlencoded({ extended: true })(req, res, next);
+});
 
 startApolloServer(app);
 

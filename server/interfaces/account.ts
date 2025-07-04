@@ -1,5 +1,5 @@
 export interface IAccount {
-  _id?: string;
+  id?: string;
   name: string;
   email: string;
   createdAt?: string;
