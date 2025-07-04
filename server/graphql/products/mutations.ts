@@ -19,7 +19,9 @@ export const mutations = {
         validatedInput.accountId
       );
       if (!account) {
-        logger.warn('Product creation failed - account not found', { accountId: validatedInput.accountId });
+        logger.warn('Product creation failed - account not found', {
+          accountId: validatedInput.accountId,
+        });
         throw new GraphQLError('La cuenta especificada no existe', {
           extensions: { code: 'ACCOUNT_NOT_FOUND' },
         });
@@ -29,7 +31,9 @@ export const mutations = {
         validatedInput.sku
       );
       if (existingProduct) {
-        logger.warn('Product creation failed - SKU already exists', { sku: validatedInput.sku });
+        logger.warn('Product creation failed - SKU already exists', {
+          sku: validatedInput.sku,
+        });
         throw new GraphQLError('Ya existe un producto con este SKU', {
           extensions: { code: 'SKU_ALREADY_EXISTS' },
         });
@@ -40,18 +44,24 @@ export const mutations = {
       logger.info('Product created successfully via GraphQL', {
         id: newProduct.id,
         sku: newProduct.sku,
-        accountId: newProduct.accountId
+        accountId: newProduct.accountId,
       });
 
       return newProduct;
     } catch (error: any) {
       if (error.name === 'ZodError') {
-        logger.warn('Invalid input data for product creation', { input, error: error.errors });
+        logger.warn('Invalid input data for product creation', {
+          input,
+          error: error.errors,
+        });
         throw new GraphQLError('Datos de entrada inválidos', {
           extensions: { code: 'INVALID_INPUT', details: error.errors },
         });
       }
-      logger.error('Error in createProduct mutation', { input, error: error.message });
+      logger.error('Error in createProduct mutation', {
+        input,
+        error: error.message,
+      });
       throw error;
     }
   },
@@ -75,7 +85,9 @@ export const mutations = {
         validatedInput.accountId
       );
       if (!account) {
-        logger.warn('Purchase failed - account not found', { accountId: validatedInput.accountId });
+        logger.warn('Purchase failed - account not found', {
+          accountId: validatedInput.accountId,
+        });
         return {
           success: false,
           message: 'La cuenta especificada no existe',
@@ -87,7 +99,9 @@ export const mutations = {
         validatedInput.productId
       );
       if (!product) {
-        logger.warn('Purchase failed - product not found', { productId: validatedInput.productId });
+        logger.warn('Purchase failed - product not found', {
+          productId: validatedInput.productId,
+        });
         return {
           success: false,
           message: 'El producto especificado no existe',
@@ -99,7 +113,7 @@ export const mutations = {
         logger.warn('Purchase failed - product does not belong to account', {
           productId: validatedInput.productId,
           accountId: validatedInput.accountId,
-          productAccountId: product.accountId
+          productAccountId: product.accountId,
         });
         return {
           success: false,
@@ -112,7 +126,7 @@ export const mutations = {
         logger.warn('Purchase failed - insufficient stock', {
           productId: validatedInput.productId,
           requestedQuantity: validatedInput.quantity,
-          availableStock: product.stock
+          availableStock: product.stock,
         });
         return {
           success: false,
@@ -130,7 +144,7 @@ export const mutations = {
         productId: validatedInput.productId,
         accountId: validatedInput.accountId,
         quantity: validatedInput.quantity,
-        newStock: updatedProduct?.stock
+        newStock: updatedProduct?.stock,
       });
 
       return {
@@ -144,7 +158,7 @@ export const mutations = {
           accountId,
           productId,
           quantity,
-          error: error.errors
+          error: error.errors,
         });
         throw new GraphQLError('Parámetros inválidos', {
           extensions: { code: 'INVALID_INPUT', details: error.errors },
@@ -154,7 +168,7 @@ export const mutations = {
         accountId,
         productId,
         quantity,
-        error: error.message
+        error: error.message,
       });
       return {
         success: false,

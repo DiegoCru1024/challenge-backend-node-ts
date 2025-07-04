@@ -26,7 +26,10 @@ export class AccountRepository {
       this.logger.info('Account created successfully', { id: savedAccount.id });
       return savedAccount;
     } catch (error) {
-      this.logger.error('Error creating account', { error, email: accountData.email });
+      this.logger.error('Error creating account', {
+        error,
+        email: accountData.email,
+      });
       throw error;
     }
   }

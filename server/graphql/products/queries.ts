@@ -22,7 +22,10 @@ export const queries = {
         });
       }
 
-      logger.info('Product query successful', { id: validatedId, sku: product.sku });
+      logger.info('Product query successful', {
+        id: validatedId,
+        sku: product.sku,
+      });
       return product;
     } catch (error: any) {
       if (error.name === 'ZodError') {
@@ -51,18 +54,24 @@ export const queries = {
       logger.info('Products by account query successful', {
         accountId: validatedFilter.accountId,
         resultCount: result.data.length,
-        totalPages: result.totalPages
+        totalPages: result.totalPages,
       });
 
       return result;
     } catch (error: any) {
       if (error.name === 'ZodError') {
-        logger.warn('Invalid filter parameters for products by account', { filter, error: error.errors });
+        logger.warn('Invalid filter parameters for products by account', {
+          filter,
+          error: error.errors,
+        });
         throw new GraphQLError('Parámetros de filtro inválidos', {
           extensions: { code: 'INVALID_INPUT', details: error.errors },
         });
       }
-      logger.error('Error in productsByAccount query', { filter, error: error.message });
+      logger.error('Error in productsByAccount query', {
+        filter,
+        error: error.message,
+      });
       throw error;
     }
   },

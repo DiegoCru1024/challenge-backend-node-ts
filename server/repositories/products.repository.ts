@@ -23,10 +23,16 @@ export class ProductRepository {
     try {
       const product = new Products(productData);
       const savedProduct = await product.save();
-      this.logger.info('Product created successfully', { id: savedProduct.id, sku: savedProduct.sku });
+      this.logger.info('Product created successfully', {
+        id: savedProduct.id,
+        sku: savedProduct.sku,
+      });
       return savedProduct;
     } catch (error) {
-      this.logger.error('Error creating product', { error, sku: productData.sku });
+      this.logger.error('Error creating product', {
+        error,
+        sku: productData.sku,
+      });
       throw error;
     }
   }
@@ -77,7 +83,7 @@ export class ProductRepository {
         this.logger.info('Product stock updated successfully', {
           id,
           oldStock: updatedProduct.stock,
-          newStock
+          newStock,
         });
       } else {
         this.logger.warn('Product not found for stock update', { id });
@@ -85,14 +91,21 @@ export class ProductRepository {
 
       return updatedProduct;
     } catch (error) {
-      this.logger.error('Error updating product stock', { error, id, newStock });
+      this.logger.error('Error updating product stock', {
+        error,
+        id,
+        newStock,
+      });
       throw error;
     }
   }
 
   async decreaseStock(id: string, quantity: number): Promise<IProduct | null> {
     try {
-      this.logger.info('Attempting to decrease product stock', { id, quantity });
+      this.logger.info('Attempting to decrease product stock', {
+        id,
+        quantity,
+      });
 
       const product = await Products.findById(id);
       if (!product) {
@@ -104,7 +117,7 @@ export class ProductRepository {
         this.logger.warn('Insufficient stock for decrease operation', {
           id,
           currentStock: product.stock,
-          requestedQuantity: quantity
+          requestedQuantity: quantity,
         });
         throw new Error('Stock insuficiente');
       }
@@ -114,12 +127,16 @@ export class ProductRepository {
         id,
         currentStock: product.stock,
         quantity,
-        newStock
+        newStock,
       });
 
       return await this.updateStock(id, newStock);
     } catch (error) {
-      this.logger.error('Error decreasing product stock', { error, id, quantity });
+      this.logger.error('Error decreasing product stock', {
+        error,
+        id,
+        quantity,
+      });
       throw error;
     }
   }

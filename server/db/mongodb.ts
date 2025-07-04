@@ -16,7 +16,7 @@ const makeNewConnection = (name: string, uri: string) => {
     logger.error('Error connecting to MongoDB', {
       database: name,
       error: error.message,
-      stack: error.stack
+      stack: error.stack,
     });
     db.close().catch(() =>
       logger.warn('Failed to close MongoDB connection', { database: name })

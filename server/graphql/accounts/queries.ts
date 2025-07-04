@@ -22,7 +22,10 @@ export const queries = {
         });
       }
 
-      logger.info('Account query successful', { id: validatedId, accountEmail: account.email });
+      logger.info('Account query successful', {
+        id: validatedId,
+        accountEmail: account.email,
+      });
       return account;
     } catch (error: any) {
       if (error.name === 'ZodError') {
@@ -51,13 +54,16 @@ export const queries = {
       logger.info('Accounts query successful', {
         filter: validatedFilter,
         resultCount: result.data.length,
-        totalPages: result.totalPages
+        totalPages: result.totalPages,
       });
 
       return result;
     } catch (error: any) {
       if (error.name === 'ZodError') {
-        logger.warn('Invalid filter parameters', { filter, error: error.errors });
+        logger.warn('Invalid filter parameters', {
+          filter,
+          error: error.errors,
+        });
         throw new GraphQLError('Parámetros de filtro inválidos', {
           extensions: { code: 'INVALID_INPUT', details: error.errors },
         });
